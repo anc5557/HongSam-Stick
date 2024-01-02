@@ -2,6 +2,8 @@
 
 ## 백엔드
 
+- gradle 빌드
+  - ./gradlew build or gradle build
 - backend/src/main/resources/application.properties
   - 파일 추가해야함 .gitignore에 추가해놓음
 - gradle 사용
