@@ -1,0 +1,13 @@
+# .gitignore for frontend
+
+/node_modules
+
+.vscode
+.env
+
+# 로그
+*.log
+
+# 임시 파일
+.tmp
+temp
