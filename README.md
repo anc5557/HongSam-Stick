@@ -11,9 +11,20 @@
   - 자바 버전 17
   - 스프링 부트 버전 3.2.1
 
-## 프론트엔드
+### 파일 구조
 
-- npm install
-- 버전 정보
-  - npm v9.7.2
-  - node v20.9.0
+- src/main/java/com/hongsamstick/question
+  - controller
+    - 컨트롤러
+  - domain
+    - 도메인
+  - dto
+    - dto
+  - exception
+    - 예외처리
+  - repository
+    - 레포지토리
+  - service
+    - 서비스
+  - StickApplication.java
+    - 메인
