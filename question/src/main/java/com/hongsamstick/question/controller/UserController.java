@@ -3,6 +3,7 @@ package com.hongsamstick.question.controller;
 import com.hongsamstick.question.dto.RegisterDto;
 import com.hongsamstick.question.service.UserService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -57,5 +58,23 @@ public class UserController {
   @ResponseBody
   public boolean checkName(@RequestParam String name) {
     return userService.nameExists(name);
+  }
+
+  // 로그인 페이지
+  @GetMapping("/login")
+  public String loginPage(
+    @RequestParam(value = "error", required = false) String error,
+    @RequestParam(value = "exception", required = false) String exception,
+    Model model
+  ) {
+    model.addAttribute("error", error);
+    model.addAttribute("exception", exception);
+    return "login";
+  }
+
+  //홈
+  @GetMapping("/home")
+  public String homePage() {
+    return "home";
   }
 }
