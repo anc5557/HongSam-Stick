@@ -56,7 +56,7 @@ public class SecurityConfig {
     http.logout(logout -> // 로그아웃 정책
       logout
         .logoutUrl("/logout") // 로그아웃 처리 URL
-        .logoutSuccessUrl("/") // 로그아웃 성공 후 이동할 URL
+        .logoutSuccessUrl("/home") // 로그아웃 성공 후 이동할 URL
         .invalidateHttpSession(true) // 세션 초기화
     );
 
