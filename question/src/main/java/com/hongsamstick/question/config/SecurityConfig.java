@@ -47,7 +47,7 @@ public class SecurityConfig {
         .loginPage("/login") // 커스텀 로그인 페이지
         .loginProcessingUrl("/login-process") // 로그인 처리 URL
         .failureHandler(userLoginFailHandler) // 로그인 실패 핸들러
-        .defaultSuccessUrl("/home") // 로그인 성공 후 이동할 URL
+        .defaultSuccessUrl("/") // 로그인 성공 후 이동할 URL
         .usernameParameter("email")
         .passwordParameter("password")
         .permitAll() // 로그인 페이지는 인증이나 권한이 없어도 접근 가능
@@ -56,7 +56,7 @@ public class SecurityConfig {
     http.logout(logout -> // 로그아웃 정책
       logout
         .logoutUrl("/logout") // 로그아웃 처리 URL
-        .logoutSuccessUrl("/home") // 로그아웃 성공 후 이동할 URL
+        .logoutSuccessUrl("/") // 로그아웃 성공 후 이동할 URL
         .invalidateHttpSession(true) // 세션 초기화
     );
 

@@ -30,11 +30,11 @@ public class UserController {
         registerDto.getPassword(),
         registerDto.getName()
       );
-      return "redirect:/home"; // 일단 home으로 리다이렉트 해놓음
+      return "redirect:/"; // 회원가입 성공 시 메인 페이지로 이동
     } catch (RuntimeException e) {
       redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
       redirectAttributes.addFlashAttribute("registerDto", registerDto);
-      return "redirect:/register";
+      return "redirect:/register"; // 회원가입 실패 시 회원가입 페이지로 이동
     }
   }
 
@@ -72,9 +72,4 @@ public class UserController {
     return "login";
   }
 
-  //홈
-  @GetMapping("/home")
-  public String homePage() {
-    return "home";
-  }
 }
