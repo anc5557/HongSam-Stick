@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>회원가입</title>
 </head>
+
 <body>
     <h1>회원가입</h1>
-    <form action="#" th:action="@{/register}" th:object="${registerDto}" method="post">
+    <form action="#" th:action="@{/member/signup}" th:object="${signupDto}" method="post">
         <!-- 이메일 필드 -->
         <p>
             <label for="email">이메일: </label>
@@ -21,7 +26,9 @@
         <!-- 비밀번호 필드 -->
         <p>
             <label for="password">비밀번호: </label>
-            <input type="password" id="password" th:field="*{password}" pattern="^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':\\|,.<>\/?]).{8,16}$" title="비밀번호는 숫자, 영문자, 특수문자를 포함한 8~16자리여야 합니다." required>
+            <input type="password" id="password" th:field="*{password}"
+                pattern="^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':\\|,.<>\/?]).{8,16}$"
+                title="비밀번호는 숫자, 영문자, 특수문자를 포함한 8~16자리여야 합니다." required>
         </p>
         <p th:if="${errorMessage}" th:text="${errorMessage}"></p>
         <p>
@@ -44,7 +51,7 @@
                 alert('올바른 이메일 형식을 입력해주세요.');
                 return;
             }
-            fetch('/check-email?email=' + email)
+            fetch('/member/check-email?email=' + email)
                 .then(response => response.json())
                 .then(data => {
                     if (data) {
@@ -62,7 +69,7 @@
                 alert('이름을 입력해주세요.');
                 return;
             }
-            fetch('/check-name?name=' + name)
+            fetch('/member/check-name?name=' + name)
                 .then(response => response.json())
                 .then(data => {
                     if (data) {
@@ -74,6 +81,7 @@
                 .catch(error => console.error('Error:', error));
         }
     </script>
-    
+
 </body>
+
 </html>

@@ -1,35 +1,35 @@
 package com.hongsamstick.question.service;
 
-import com.hongsamstick.question.domain.User;
-import com.hongsamstick.question.repository.UserRepository;
+import com.hongsamstick.question.domain.Member;
+import com.hongsamstick.question.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UserService {
+public class MemberService {
 
-  private final UserRepository userRepository;
+  private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
 
-  public UserService(
-    UserRepository userRepository,
+  public MemberService(
+    MemberRepository memberRepository,
     PasswordEncoder passwordEncoder
   ) {
-    this.userRepository = userRepository;
+    this.memberRepository = memberRepository;
     this.passwordEncoder = passwordEncoder;
   }
 
   // 회원가입
   @Transactional
-  public User register(String email, String password, String name) {
+  public Member register(String email, String password, String name) {
     // 이메일 중복 검사
-    if (userRepository.existsByEmail(email)) {
+    if (memberRepository.existsByEmail(email)) {
       throw new RuntimeException("이미 가입된 이메일입니다.");
     }
 
     // 이름 중복 검사
-    if (userRepository.existsByName(name)) {
+    if (memberRepository.existsByName(name)) {
       throw new RuntimeException("이미 존재하는 이름입니다.");
     }
 
@@ -40,12 +40,12 @@ public class UserService {
       );
     }
 
-    User newUser = new User();
-    newUser.setEmail(email);
-    newUser.setPassword(passwordEncoder.encode(password));
-    newUser.setName(name);
+    Member newMember = new Member();
+    newMember.setEmail(email);
+    newMember.setPassword(passwordEncoder.encode(password));
+    newMember.setName(name);
 
-    return userRepository.save(newUser);
+    return memberRepository.save(newMember);
   }
 
   // 비밀번호 유효성 검사
@@ -57,11 +57,11 @@ public class UserService {
 
   // 이메일 확인
   public boolean emailExists(String email) {
-    return userRepository.existsByEmail(email);
+    return memberRepository.existsByEmail(email);
   }
 
   // 이름 중복 확인
   public boolean nameExists(String name) {
-    return userRepository.existsByName(name);
+    return memberRepository.existsByName(name);
   }
 }

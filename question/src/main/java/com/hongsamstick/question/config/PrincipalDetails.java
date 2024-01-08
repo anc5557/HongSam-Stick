@@ -1,6 +1,6 @@
 package com.hongsamstick.question.config;
 
-import com.hongsamstick.question.domain.User;
+import com.hongsamstick.question.domain.Member;
 import java.util.Collection;
 import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,10 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class PrincipalDetails implements UserDetails {
 
-  private User user;
+  private Member member;
 
-  public PrincipalDetails(User user) {
-    this.user = user;
+  public PrincipalDetails(Member member) {
+    this.member = member;
   }
 
   @Override
@@ -21,12 +21,12 @@ public class PrincipalDetails implements UserDetails {
 
   @Override
   public String getUsername() {
-    return user.getEmail();
+    return member.getEmail();
   }
 
   @Override
   public String getPassword() {
-    return user.getPassword();
+    return member.getPassword();
   }
 
   @Override

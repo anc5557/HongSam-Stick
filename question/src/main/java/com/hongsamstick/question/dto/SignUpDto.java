@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RegisterDto {
+public class SignUpDto {
 
   // 회원가입 요청에 필요한 데이터
   private String email;

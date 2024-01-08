@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>로그인</title>
 </head>
+
 <body>
     <h1>로그인</h1>
-    <form action="/login-process" method="post">
+    <form action="/member/login-process" method="post">
         <!-- 이메일 필드 -->
         <p>
             <label for="email">이메일: </label>
@@ -24,8 +29,9 @@
         <p>
             <button type="submit">로그인</button>
         </p>
-        
-        
+
+
     </form>
 </body>
+
 </html>

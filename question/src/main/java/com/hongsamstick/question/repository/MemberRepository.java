@@ -1,13 +1,13 @@
 package com.hongsamstick.question.repository;
 
-import com.hongsamstick.question.domain.User;
+import com.hongsamstick.question.domain.Member;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-  Optional<User> findByEmail(String email); 
+public interface MemberRepository extends JpaRepository<Member, Long> {
+  Optional<Member> findByEmail(String email); 
 
-  Optional<User> findByName(String name); 
+  Optional<Member> findByName(String name); 
 
   boolean existsByEmail(String email); // 이메일 중복 검사
 

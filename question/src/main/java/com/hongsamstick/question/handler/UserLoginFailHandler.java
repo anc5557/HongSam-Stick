@@ -43,7 +43,7 @@ public class UserLoginFailHandler
     }
 
     errorMessage = URLEncoder.encode(errorMessage, "UTF-8");
-    setDefaultFailureUrl("/login?error=true&exception=" + errorMessage);
+    setDefaultFailureUrl("/member/signin?error=true&exception=" + errorMessage);
 
     super.onAuthenticationFailure(request, response, exception);
   }
