@@ -1,5 +1,7 @@
 package com.hongsamstick.question.controller;
 
+import com.hongsamstick.question.dto.EmailDto;
+import com.hongsamstick.question.dto.NameDto;
 import com.hongsamstick.question.dto.SignUpDto;
 import com.hongsamstick.question.service.MemberService;
 import org.springframework.stereotype.Controller;
@@ -46,17 +48,17 @@ public class MemberController {
   }
 
   // 이메일 확인
-  @GetMapping("/check-email")
+  @PostMapping("/check-email")
   @ResponseBody
-  public boolean checkEmail(@RequestParam String email) {
-    return memberService.emailExists(email);
+  public boolean checkEmail(@RequestBody EmailDto emailDto) {
+    return memberService.emailExists(emailDto.getEmail());
   }
 
   // 이름 중복 확인
-  @GetMapping("/check-name")
+  @PostMapping("/check-name")
   @ResponseBody
-  public boolean checkName(@RequestParam String name) {
-    return memberService.nameExists(name);
+  public boolean checkName(@RequestBody NameDto nameDto) {
+    return memberService.nameExists(nameDto.getName());
   }
 
   // 로그인 페이지
