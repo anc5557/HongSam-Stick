@@ -2,12 +2,14 @@ package com.hongsamstick.question.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class EmailDto {
+@NoArgsConstructor
+public class UnregisterResponseDto {
 
-  private String email;
+  private String message;
 }
