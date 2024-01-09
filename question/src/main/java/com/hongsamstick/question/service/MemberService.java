@@ -1,7 +1,9 @@
 package com.hongsamstick.question.service;
 
+import com.hongsamstick.question.config.PrincipalDetails;
 import com.hongsamstick.question.domain.Member;
 import com.hongsamstick.question.repository.MemberRepository;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,5 +65,27 @@ public class MemberService {
   // 이름 중복 확인
   public boolean nameExists(String name) {
     return memberRepository.existsByName(name);
+  }
+
+  // 회원 탈퇴
+  @Transactional
+  public boolean unregister(
+    @AuthenticationPrincipal PrincipalDetails principalDetails,
+    String inputPassword
+  ) {
+    String email = principalDetails.getUsername(); // 현재 인증된 사용자의 이메일
+
+    Member member = memberRepository.findByEmail(email).orElse(null); // 현재 인증된 사용자
+
+    // 현재 인증된 사용자가 없거나, 입력한 비밀번호가 일치하지 않으면 false 반환
+    if (
+      member == null ||
+      !passwordEncoder.matches(inputPassword, member.getPassword())
+    ) {
+      return false;
+    }
+
+    memberRepository.deleteByEmail(email);
+    return true;
   }
 }
