@@ -121,7 +121,6 @@ public class MemberServiceTest {
 
   @Test
   @DisplayName("회원 탈퇴 테스트 - 비밀번호가 맞는 경우")
-  @WithMockUser(username = "test@example.com")
   void testUnregisterWithCorrectPassword() {
     String email = "test@example.com";
     String correctPassword = "correctPassword123!";
