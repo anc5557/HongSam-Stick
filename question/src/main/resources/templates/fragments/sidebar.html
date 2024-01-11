@@ -35,7 +35,7 @@
         width: 200px;
       }
 
-      .sidebar .btn {
+      .btn-group-vertical .btn {
         padding-left: 2rem;
         display: flex;
 
@@ -125,11 +125,11 @@
       </a>
     </div>
 
-    <div class="mt-auto custom-mb text-center">
+    <div class="mt-auto custom-mb text-center border-top border-2  logoutbox">
       <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
         <form action="/member/logout" method="post">
           <div class="d-flex justify-content-center">
-            <input type="submit" value="로그아웃" class="btn btn-outline-primary btn-sm w-75" />
+            <input type="submit" value="로그아웃" class="btn btn-outline-primary btn-sm w-75 text-center" />
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
           </div>
         </form>
