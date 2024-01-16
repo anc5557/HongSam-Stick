@@ -33,24 +33,26 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.authorizeHttpRequests(auth -> // 인가 정책
+    http.authorizeHttpRequests(auth -> {
       auth
-        // 내정보 조회, 수정 페이지, 질문게시판 등록, 수정 페이지는 인증만 되어 있어야 한다.
+        // 로그인 및 회원가입 페이지는 인증되지 않은 사용자만 접근 가능
+        .requestMatchers("/member/signin", "/member/signup")
+        .anonymous()
+        // 나머지 경로는 인증된 사용자만 접근 가능
         .requestMatchers("/mypage", "/mypage/**", "/question/**")
-        .authenticated() // 인증만 되어 있으면 접근 가능
-        // 그 외의 페이지는 인증이나 권한이 없어도 접근 가능
+        .authenticated()
+        // 그 외 나머지 경로는 모든 사용자 접근 가능
         .anyRequest()
-        .permitAll()
-    );
+        .permitAll();
+    });
     http.formLogin(form -> // 커스텀 로그인
       form
-        .loginPage("/member/sigin") // 커스텀 로그인 페이지
+        .loginPage("/member/signin") // 커스텀 로그인 페이지
         .loginProcessingUrl("/member/login-process") // 로그인 처리 URL
         .failureHandler(userLoginFailHandler) // 로그인 실패 핸들러
         .defaultSuccessUrl("/") // 로그인 성공 후 이동할 URL
         .usernameParameter("email")
         .passwordParameter("password")
-        .permitAll() // 로그인 페이지는 인증이나 권한이 없어도 접근 가능
     );
 
     http.logout(logout -> // 로그아웃 정책
