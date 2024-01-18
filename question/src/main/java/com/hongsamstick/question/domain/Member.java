@@ -10,15 +10,13 @@ import lombok.Setter;
 public class Member {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Column(unique = true, nullable = false)
+  private String email; // 이메일로 기본 키 설정
 
-  @Column(unique = true)
-  private String email; // 이메일(중복 불가)
-
+  @Column(nullable = false)
   private String password; // 비밀번호
 
-  @Column(unique = true)
+  @Column(unique = true, nullable = false)
   private String name; // 이름(중복 불가)
 
   private String picture;
