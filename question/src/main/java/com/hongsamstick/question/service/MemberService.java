@@ -97,4 +97,12 @@ public class MemberService {
     memberRepository.deleteByEmail(email);
     return true;
   }
+
+  // get 내 정보 페이지
+  public Member getMyInfo(
+    @AuthenticationPrincipal PrincipalDetails principalDetails
+  ) {
+    String email = principalDetails.getUsername();
+    return memberRepository.findByEmail(email).orElse(null);
+  }
 }

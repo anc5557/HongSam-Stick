@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout}" layout:fragment="content">
+
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>내정보</title>
+
+</head>
+
+<body>
+  <div class="myinfo-container text-center mx-md-5 mx-sm-5 ">
+    <hr class="my-5" />
+    <h1>내 정보</h1>
+    <div class="profile-box my-2">
+      <img th:src="${picture}" alt="profile" width="200" style="border-radius: 50%;" />
+    </div>
+    <div class="myinfo-box">
+      <div class="myinfo-item">
+        <div class="myinfo-label h2">이름</div>
+        <div class="myinfo-value fs-5 mb-3" th:text="${name}"></div>
+      </div>
+      <div class="myinfo-item">
+        <div class="myinfo-label h2">이메일</div>
+        <div class="myinfo-value fs-5 mb-5" th:text="${email}"></div>
+      </div>
+    </div>
+    <!--선-->
+    <hr class="mt-5" />
+    <div class="d-flex justify-content-end me-md-5 mx-sm-5">
+      <a href="/member/update" class="text-danger">비밀번호 변경/ 정보 수정</a>
+      <a href="/member/unregister" class="text-danger ms-3">회원 탈퇴</a>
+    </div>
+  </div>
+</body>
+
+</html>

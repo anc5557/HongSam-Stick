@@ -46,7 +46,7 @@
           <i class="bi bi-hash me-2 fs-3"></i> <span class="fs-4"> 코드로 참석하기 </span>
         </a>
         <!-- 로그인한 사용자를 위한 버튼들 -->
-        <a href="/my-info" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
+        <a href="/member/myinfo" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
           <i class="bi bi-person-circle me-2 fs-3"></i> <span class="fs-4"> 내정보 </span>
         </a>
         <a href="/join-with-code" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
