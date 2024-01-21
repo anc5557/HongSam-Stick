@@ -30,6 +30,11 @@ public class MemberService {
       throw new RuntimeException("이미 가입된 이메일입니다.");
     }
 
+    // 이메일 형식 검사
+    if (!email.contains("@")) {
+      throw new RuntimeException("이메일 형식이 올바르지 않습니다.");
+    }
+
     // 이름 중복 검사
     if (memberRepository.existsByName(name)) {
       throw new RuntimeException("이미 존재하는 이름입니다.");
@@ -40,6 +45,10 @@ public class MemberService {
       throw new RuntimeException(
         "비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자리여야 합니다."
       );
+    }
+
+    if (email == null || password == null || name == null) {
+      throw new RuntimeException("입력되지 않은 값이 있습니다.");
     }
 
     Member newMember = new Member();
@@ -87,5 +96,13 @@ public class MemberService {
 
     memberRepository.deleteByEmail(email);
     return true;
+  }
+
+  // get 내 정보 페이지
+  public Member getMyInfo(
+    @AuthenticationPrincipal PrincipalDetails principalDetails
+  ) {
+    String email = principalDetails.getUsername();
+    return memberRepository.findByEmail(email).orElse(null);
   }
 }

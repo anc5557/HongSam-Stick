@@ -1,6 +1,7 @@
 package com.hongsamstick.question.controller;
 
 import com.hongsamstick.question.config.PrincipalDetails;
+import com.hongsamstick.question.domain.Member;
 import com.hongsamstick.question.dto.EmailDto;
 import com.hongsamstick.question.dto.NameDto;
 import com.hongsamstick.question.dto.SignUpDto;
@@ -145,5 +146,22 @@ public class MemberController {
     modelAndView.addObject("message", "회원 탈퇴가 성공적으로 처리되었습니다.");
     modelAndView.setViewName("redirect:/member/signin");
     return modelAndView;
+  }
+
+  /**
+   * 내 정보 페이지 렌더링
+   * - GET /member/myinfo
+   * - 내 정보 페이지로 이동합니다.
+   */
+  @GetMapping("/myinfo")
+  public String myInfo(
+    @AuthenticationPrincipal PrincipalDetails principalDetails,
+    Model model
+  ) {
+    Member member = memberService.getMyInfo(principalDetails);
+    model.addAttribute("email", member.getEmail());
+    model.addAttribute("name", member.getName());
+    model.addAttribute("picture", member.getPicture());
+    return "myinfo";
   }
 }
