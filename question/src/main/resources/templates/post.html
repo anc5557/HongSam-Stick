@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout}" layout:fragment="content">
+
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>게시판</title>
+
+</head>
+
+<body>
+  <div class="container">
+    <h1>게시판 상세보기</h1>
+    <div class="post-details">
+      <h2 th:text="${post.title}">제목</h2>
+      <p th:text="${post.content}">내용</p>
+      <p><strong>조회수:</strong> <span th:text="${post.viewcount}">0</span></p>
+      <p><strong>작성자:</strong> <span th:text="${post.member.email}">이메일</span></p>
+      <p><strong>시작 날짜:</strong> <span th:text="${#temporals.format(post.startDate, 'yyyy-MM-dd HH:mm')}">시작 날짜</span>
+      </p>
+      <p><strong>종료 날짜:</strong>
+        <span th:if="${post.endDate != null}" th:text="${#temporals.format(post.endDate, 'yyyy-MM-dd HH:mm')}">종료
+          날짜</span>
+        <span th:unless="${post.endDate != null}"> 종료 날짜 없음 </span>
+      </p>
+    </div>
+
+    <!-- 수정 및 삭제 버튼 -->
+    <div class="post-actions">
+      <a th:href="@{/post/{code}/edit(code=${post.code})}" class="btn btn-primary">수정하기</a>
+      <form th:action="@{/post/{code}(code=${post.code})}" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+        <input type="hidden" name="_method" value="delete" />
+        <button type="submit" class="btn btn-danger">삭제하기</button>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>
