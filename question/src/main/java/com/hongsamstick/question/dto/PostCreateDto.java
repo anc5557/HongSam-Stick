@@ -1,17 +1,19 @@
 package com.hongsamstick.question.dto;
 
-import com.hongsamstick.question.domain.Member;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PostCreateDto {
-
-  @NotNull(message = "멤버 정보는 필수입니다.")
-  private Member member;
 
   @NotNull(message = "제목은 필수입니다.")
   @Size(
