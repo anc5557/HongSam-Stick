@@ -7,6 +7,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -96,5 +98,15 @@ public class PostService {
     }
 
     postRepository.delete(post);
+  }
+
+  // index 페이지에 게시판 목록 보여주기
+  // readPermission이 0이고 endDate가 현재 시간보다 큰 게시글 찾기
+  public Page<Post> getPosts(Integer readPermission, Pageable pageable) {
+    return postRepository.findByReadPermissionAndEndDateIsNullOrEndDateAfter(
+      readPermission,
+      LocalDateTime.now(),
+      pageable
+    );
   }
 }
