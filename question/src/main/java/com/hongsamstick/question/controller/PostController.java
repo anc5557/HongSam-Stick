@@ -9,6 +9,7 @@ import com.hongsamstick.question.service.PostService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.util.UUID;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,14 +22,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class PostController {
 
   private final PostService postService;
-  private final PostRepository PostRepository;
+  private final PostRepository postRepository;
 
   public PostController(
     PostService postService,
-    PostRepository PostRepository
+    PostRepository postRepository
   ) {
     this.postService = postService;
-    this.PostRepository = PostRepository;
+    this.postRepository = postRepository;
   }
 
   /**
@@ -52,6 +53,11 @@ public class PostController {
     if (result.hasErrors()) {
       redirectAttributes.addFlashAttribute("errors", result.getAllErrors());
       redirectAttributes.addFlashAttribute("postCreateDto", postCreateDto);
+      return "redirect:/post/create";
+    }
+
+    if (principalDetails == null) {
+      redirectAttributes.addFlashAttribute("error", "로그인이 필요합니다.");
       return "redirect:/post/create";
     }
 
@@ -91,6 +97,11 @@ public class PostController {
       return "edit-post"; // 에러 메시지와 함께 수정 폼 페이지로 리다이렉트
     }
 
+    if (principalDetails == null) {
+      model.addAttribute("errorMessage", "로그인이 필요합니다.");
+      return "errorPage"; // 오류 페이지로 리다이렉트
+    }
+
     try {
       postService.updatePost(
         code,
@@ -120,9 +131,19 @@ public class PostController {
   @DeleteMapping("/{code}")
   public String deletePost(
     @AuthenticationPrincipal PrincipalDetails principalDetails,
-    @PathVariable UUID code
+    @PathVariable UUID code,
+    RedirectAttributes redirectAttributes
   ) {
-    postService.deletePost(code, principalDetails.getMember());
+    if (principalDetails == null) {
+      redirectAttributes.addFlashAttribute("error", "로그인이 필요합니다.");
+      return "redirect:/post/" + code;
+    }
+    try {
+      postService.deletePost(code, principalDetails.getMember());
+    } catch (AccessDeniedException ex) {
+      redirectAttributes.addFlashAttribute("error", ex.getMessage());
+      return "redirect:/post/" + code;
+    }
     return "redirect:/"; // 삭제 성공 후, 메인 페이지로 리다이렉트
   }
 
@@ -148,13 +169,19 @@ public class PostController {
    * @return  post.html
    */
   @GetMapping("/{code}")
-  public String postDetail(@PathVariable UUID code, Model model) {
-    Post post = PostRepository
+  public String postDetail(
+    @PathVariable UUID code,
+    Model model,
+    @AuthenticationPrincipal PrincipalDetails principalDetails
+  ) {
+    Post post = postRepository
       .findByCode(code)
       .orElseThrow(() ->
-        new IllegalArgumentException("Invalid post UUID:" + code)
+        new EntityNotFoundException("Invalid post UUID:" + code)
       );
     model.addAttribute("post", post);
+    model.addAttribute("principalDetails", principalDetails);
+
     return "post";
   }
 
@@ -168,10 +195,10 @@ public class PostController {
    */
   @GetMapping("/{code}/edit")
   public String editPostPage(@PathVariable UUID code, Model model) {
-    Post post = PostRepository
+    Post post = postRepository
       .findByCode(code)
       .orElseThrow(() ->
-        new IllegalArgumentException("Invalid post UUID:" + code)
+        new EntityNotFoundException("Invalid post UUID:" + code)
       );
 
     // Post 객체의 데이터를 PostEditDto 객체로 복사

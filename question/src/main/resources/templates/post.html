@@ -29,12 +29,18 @@
     </div>
 
     <!-- 수정 및 삭제 버튼 -->
-    <div class="post-actions">
+    <!-- 로그인한 사용자와 게시글 작성자가 같은 경우에만 수정 및 삭제 버튼 표시 -->
+    <div class="post-actions" th:if="${principalDetails != null and post.member.email == principalDetails.username}">
       <a th:href="@{/post/{code}/edit(code=${post.code})}" class="btn btn-primary">수정하기</a>
       <form th:action="@{/post/{code}(code=${post.code})}" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
         <input type="hidden" name="_method" value="delete" />
         <button type="submit" class="btn btn-danger">삭제하기</button>
       </form>
+    </div>
+
+    <!-- error 메시지가 있는 경우 표시 -->
+    <div th:if="${error}" class="alert alert-danger" role="alert">
+      <p th:text="${error}"></p>
     </div>
   </div>
 </body>
