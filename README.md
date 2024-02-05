@@ -10,6 +10,8 @@
 - 버전 정보
   - 자바 버전 17
   - 스프링 부트 버전 3.2.1
+  - DBMS : MySQL(ver. 8.0.36)
+    DRIVER : MySQL Connector/J (ver. mysql-connector-java-8.0.25, JDBC 4.2)
 
 ### 파일 구조
 
