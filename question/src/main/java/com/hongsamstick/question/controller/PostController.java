@@ -24,6 +24,14 @@ public class PostController {
   private final PostService postService;
   private final PostRepository postRepository;
 
+  private Post getPostByCode(UUID code) {
+    return postRepository
+      .findByCode(code)
+      .orElseThrow(() ->
+        new EntityNotFoundException("Invalid post UUID:" + code)
+      );
+  }
+
   public PostController(
     PostService postService,
     PostRepository postRepository
@@ -174,11 +182,7 @@ public class PostController {
     Model model,
     @AuthenticationPrincipal PrincipalDetails principalDetails
   ) {
-    Post post = postRepository
-      .findByCode(code)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Invalid post UUID:" + code)
-      );
+    Post post = getPostByCode(code);
     model.addAttribute("post", post);
     model.addAttribute("principalDetails", principalDetails);
 
@@ -195,11 +199,7 @@ public class PostController {
    */
   @GetMapping("/{code}/edit")
   public String editPostPage(@PathVariable UUID code, Model model) {
-    Post post = postRepository
-      .findByCode(code)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Invalid post UUID:" + code)
-      );
+    Post post = getPostByCode(code);
 
     // Post 객체의 데이터를 PostEditDto 객체로 복사
     PostEditDto postEditDto = new PostEditDto();
