@@ -2,42 +2,23 @@ package com.hongsamstick.question.controller;
 
 import com.hongsamstick.question.config.PrincipalDetails;
 import com.hongsamstick.question.domain.Post;
-import com.hongsamstick.question.dto.PostCreateDto;
-import com.hongsamstick.question.dto.PostEditDto;
-import com.hongsamstick.question.repository.PostRepository;
+import com.hongsamstick.question.dto.PostDto;
 import com.hongsamstick.question.service.PostService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.util.UUID;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/post")
 public class PostController {
 
   private final PostService postService;
-  private final PostRepository postRepository;
 
-  private Post getPostByCode(UUID code) {
-    return postRepository
-      .findByCode(code)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Invalid post UUID:" + code)
-      );
-  }
-
-  public PostController(
-    PostService postService,
-    PostRepository postRepository
-  ) {
+  public PostController(PostService postService) {
     this.postService = postService;
-    this.postRepository = postRepository;
   }
 
   /**
@@ -53,28 +34,14 @@ public class PostController {
   @PostMapping
   public String createPost(
     @AuthenticationPrincipal PrincipalDetails principalDetails,
-    @Valid @ModelAttribute PostCreateDto postCreateDto,
-    BindingResult result,
-    Model model,
-    RedirectAttributes redirectAttributes
+    @Valid @ModelAttribute PostDto postDto
   ) {
-    if (result.hasErrors()) {
-      redirectAttributes.addFlashAttribute("errors", result.getAllErrors());
-      redirectAttributes.addFlashAttribute("postCreateDto", postCreateDto);
-      return "redirect:/post/create";
-    }
-
-    if (principalDetails == null) {
-      redirectAttributes.addFlashAttribute("error", "로그인이 필요합니다.");
-      return "redirect:/post/create";
-    }
-
     UUID code = postService.createPost(
-      postCreateDto.getTitle(),
-      postCreateDto.getContent(),
-      postCreateDto.getReadPermission(),
-      postCreateDto.getWritePermission(),
-      postCreateDto.getEndDate(),
+      postDto.getTitle(),
+      postDto.getContent(),
+      postDto.getReadPermission(),
+      postDto.getWritePermission(),
+      postDto.getEndDate(),
       principalDetails.getMember()
     );
     return "redirect:/post/" + code.toString();
@@ -95,37 +62,18 @@ public class PostController {
   public String updatePost(
     @AuthenticationPrincipal PrincipalDetails principalDetails,
     @PathVariable UUID code,
-    @ModelAttribute PostEditDto postEditDto,
-    BindingResult result,
-    Model model
+    @Valid @ModelAttribute PostDto postDto
   ) {
-    if (result.hasErrors()) {
-      model.addAttribute("errors", result.getAllErrors());
-      model.addAttribute("postEditDto", postEditDto);
-      return "edit-post"; // 에러 메시지와 함께 수정 폼 페이지로 리다이렉트
-    }
-
-    if (principalDetails == null) {
-      model.addAttribute("errorMessage", "로그인이 필요합니다.");
-      return "errorPage"; // 오류 페이지로 리다이렉트
-    }
-
-    try {
-      postService.updatePost(
-        code,
-        postEditDto.getTitle(),
-        postEditDto.getContent(),
-        postEditDto.getReadPermission(),
-        postEditDto.getWritePermission(),
-        postEditDto.getEndDate(),
-        principalDetails.getMember()
-      );
-      return "redirect:/post/" + code.toString(); // 수정 성공 후, 해당 게시물 상세 페이지로 리다이렉트
-    } catch (EntityNotFoundException e) {
-      // 게시물을 찾을 수 없는 경우의 처리
-      model.addAttribute("errorMessage", "게시물을 찾을 수 없습니다.");
-      return "errorPage"; // 오류 페이지로 리다이렉트
-    }
+    postService.updatePost(
+      code,
+      postDto.getTitle(),
+      postDto.getContent(),
+      postDto.getReadPermission(),
+      postDto.getWritePermission(),
+      postDto.getEndDate(),
+      principalDetails.getMember()
+    );
+    return "redirect:/post/" + code.toString();
   }
 
   /**
@@ -139,19 +87,9 @@ public class PostController {
   @DeleteMapping("/{code}")
   public String deletePost(
     @AuthenticationPrincipal PrincipalDetails principalDetails,
-    @PathVariable UUID code,
-    RedirectAttributes redirectAttributes
+    @PathVariable UUID code
   ) {
-    if (principalDetails == null) {
-      redirectAttributes.addFlashAttribute("error", "로그인이 필요합니다.");
-      return "redirect:/post/" + code;
-    }
-    try {
-      postService.deletePost(code, principalDetails.getMember());
-    } catch (AccessDeniedException ex) {
-      redirectAttributes.addFlashAttribute("error", ex.getMessage());
-      return "redirect:/post/" + code;
-    }
+    postService.deletePost(code, principalDetails.getMember());
     return "redirect:/"; // 삭제 성공 후, 메인 페이지로 리다이렉트
   }
 
@@ -162,9 +100,7 @@ public class PostController {
    * @return  create-post.html
    */
   @GetMapping("/create")
-  public String createPostPage(
-    @ModelAttribute("postCreateDto") PostCreateDto postCreateDto
-  ) {
+  public String createPostPage(@ModelAttribute("postDto") PostDto postDto) {
     return "create-post";
   }
 
@@ -182,7 +118,7 @@ public class PostController {
     Model model,
     @AuthenticationPrincipal PrincipalDetails principalDetails
   ) {
-    Post post = getPostByCode(code);
+    Post post = postService.getPostByCode(code);
     model.addAttribute("post", post);
     model.addAttribute("principalDetails", principalDetails);
 
@@ -199,22 +135,10 @@ public class PostController {
    */
   @GetMapping("/{code}/edit")
   public String editPostPage(@PathVariable UUID code, Model model) {
-    Post post = getPostByCode(code);
-
-    // Post 객체의 데이터를 PostEditDto 객체로 복사
-    PostEditDto postEditDto = new PostEditDto();
-    postEditDto.setTitle(post.getTitle());
-    postEditDto.setContent(post.getContent());
-    postEditDto.setReadPermission(post.getReadPermission());
-    postEditDto.setWritePermission(post.getWritePermission());
-    postEditDto.setEndDate(post.getEndDate());
-
-    // 모델에 PostEditDto 객체 추가
-    model.addAttribute("postEditDto", postEditDto);
-
-    // 모델에 code 추가
+    Post post = postService.getPostByCode(code);
+    PostDto postDto = postService.convertPostToPostDto(post);
+    model.addAttribute("postDto", postDto);
     model.addAttribute("code", code);
-
     return "edit-post";
   }
 }

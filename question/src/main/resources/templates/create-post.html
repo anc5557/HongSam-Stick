@@ -13,7 +13,7 @@
 <body>
   <div class="container mt-3">
     <h2>게시판 개설</h2>
-    <form class="form-create-post" action="#" th:action="@{/post}" th:object="${postCreateDto}" method="post">
+    <form class="form-create-post" action="#" th:action="@{/post}" th:object="${postDto}" method="post">
       <!-- 기존 제목과 내용 필드 -->
       <div class="form-group mt-5">
         <label for="title">제목</label>

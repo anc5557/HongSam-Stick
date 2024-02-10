@@ -2,6 +2,7 @@ package com.hongsamstick.question.service;
 
 import com.hongsamstick.question.domain.Member;
 import com.hongsamstick.question.domain.Post;
+import com.hongsamstick.question.dto.PostDto;
 import com.hongsamstick.question.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,24 @@ public class PostService {
 
   public PostService(PostRepository postRepository) {
     this.postRepository = postRepository;
+  }
+
+  public Post getPostByCode(UUID code) {
+    return postRepository
+      .findByCode(code)
+      .orElseThrow(() ->
+        new EntityNotFoundException("게시판을 찾을 수 없습니다." + code)
+      );
+  }
+
+  public PostDto convertPostToPostDto(Post post) {
+    return new PostDto(
+      post.getTitle(),
+      post.getContent(),
+      post.getReadPermission(),
+      post.getWritePermission(),
+      post.getEndDate()
+    );
   }
 
   // 게시판 개설하기
@@ -56,7 +75,7 @@ public class PostService {
     Post post = postRepository
       .findByCode(code)
       .orElseThrow(() ->
-        new EntityNotFoundException("게시판을 찾을 수 없습니다.")
+        new EntityNotFoundException("게시판을 찾을 수 없습니다. code : " + code)
       );
 
     // 현재 로그인한 사용자가 null이거나 게시물의 개설자와 같지 않은지 확인
@@ -91,10 +110,9 @@ public class PostService {
     Post post = postRepository
       .findByCode(code)
       .orElseThrow(() ->
-        new EntityNotFoundException("게시판을 찾을 수 없습니다.")
+        new EntityNotFoundException("게시판을 찾을 수 없습니다." + code)
       );
 
-    // 현재 로그인한 사용자가 null이거나 게시물의 개설자와 같지 않은지 확인
     if (
       member == null || !post.getMember().getEmail().equals(member.getEmail())
     ) {

@@ -12,7 +12,7 @@
 <body>
   <div class="container mt-3">
     <h2>게시판 수정</h2>
-    <form class="form-edit-post" th:action="@{/post/{code}(code=${code})}" th:object="${postEditDto}" method="post">
+    <form class="form-edit-post" th:action="@{/post/{code}(code=${code})}" th:object="${postDto}" method="post">
       <input type="hidden" name="_method" value="put" />
 
       <div class="form-group mt-5">
@@ -44,8 +44,8 @@
           <div class="form-group mt-3">
             <label for="readPermission">공개 설정</label>
             <select class="form-control" id="readPermission" th:field="*{readPermission}">
-              <option value="0" th:selected="${postEditDto.readPermission == 0}">모두에게 공개</option>
-              <option value="1" th:selected="${postEditDto.readPermission == 1}">링크(코드) 공개</option>
+              <option value="0" th:selected="${postDto.readPermission == 0}">모두에게 공개</option>
+              <option value="1" th:selected="${postDto.readPermission == 1}">링크(코드) 공개</option>
             </select>
             <small class="text-danger" th:if="${#fields.hasErrors('readPermission')}"
               th:errors="*{readPermission}"></small>
@@ -56,8 +56,8 @@
           <div class="form-group mt-3">
             <label for="writePermission">질문 권한</label>
             <select class="form-control" id="writePermission" th:field="*{writePermission}">
-              <option value="0" th:selected="${postEditDto.writePermission == 0}">회원만 가능</option>
-              <option value="1" th:selected="${postEditDto.writePermission == 1}">익명 가능</option>
+              <option value="0" th:selected="${postDto.writePermission == 0}">회원만 가능</option>
+              <option value="1" th:selected="${postDto.writePermission == 1}">익명 가능</option>
             </select>
             <small class="text-danger" th:if="${#fields.hasErrors('writePermission')}"
               th:errors="*{writePermission}"></small>
