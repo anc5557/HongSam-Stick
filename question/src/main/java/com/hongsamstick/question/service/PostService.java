@@ -51,6 +51,11 @@ public class PostService {
     LocalDateTime endDate,
     Member member
   ) {
+    // 예외처리
+    if (member == null) {
+      throw new AccessDeniedException("로그인이 필요합니다.");
+    }
+
     Post post = new Post();
     post.setMember(member);
     post.setTitle(title);
