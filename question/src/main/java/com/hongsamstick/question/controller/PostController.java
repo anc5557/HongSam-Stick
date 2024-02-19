@@ -27,8 +27,6 @@ public class PostController {
    *
    * @param principalDetails
    * @param PostCreateDto
-   * @param result
-   * @param model
    * @return redirect:/post/{code}
    */
   @PostMapping
@@ -53,8 +51,6 @@ public class PostController {
    *
    * @param code
    * @param PostEditDto
-   * @param result
-   * @param model
    * @param principalDetails
    * @return redirect:/post/{code}
    */
@@ -110,6 +106,7 @@ public class PostController {
    *
    * @param code
    * @param model
+   * @param principalDetails
    * @return  post.html
    */
   @GetMapping("/{code}")
