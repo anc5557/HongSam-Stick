@@ -87,7 +87,7 @@ public class PostService {
     if (
       member == null || !post.getMember().getEmail().equals(member.getEmail())
     ) {
-      throw new AccessDeniedException("해당 게시물을 삭제할 권한이 없습니다.");
+      throw new AccessDeniedException("해당 게시물을 수정할 권한이 없습니다.");
     }
 
     // 수정할 내용이 있으면 수정
