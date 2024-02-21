@@ -29,10 +29,10 @@ public class Post {
   private Long viewcount = 0L;
 
   @Column(nullable = false)
-  private Integer read_permission; // 0 : 전체 공개 or 1 : (링크)코드 공개
+  private Integer readPermission; // 0 : 전체 공개 or 1 : (링크)코드 공개
 
   @Column(nullable = false)
-  private Integer write_permission; // 0 : 회원만 가능 or 1 : 익명도 가능
+  private Integer writePermission; // 0 : 회원만 가능 or 1 : 익명도 가능
 
   @Column(nullable = false)
   private LocalDateTime startDate;

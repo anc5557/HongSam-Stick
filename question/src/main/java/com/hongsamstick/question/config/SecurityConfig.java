@@ -39,7 +39,12 @@ public class SecurityConfig {
         .requestMatchers("/member/signin", "/member/signup")
         .anonymous()
         // 나머지 경로는 인증된 사용자만 접근 가능
-        .requestMatchers("/mypage", "/mypage/**", "/question/**")
+        .requestMatchers(
+          "/post/create",
+          "/post/{code}/edit",
+          "/post/{code}/delete",
+          "/post"
+        )
         .authenticated()
         // 그 외 나머지 경로는 모든 사용자 접근 가능
         .anyRequest()

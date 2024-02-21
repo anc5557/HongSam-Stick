@@ -27,7 +27,7 @@
       <a href="/my-questions" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
         <i class="bi bi-question-circle lg-me-2 fs-3"></i> <span> 내가 남긴 질문 </span>
       </a>
-      <a href="/create-board" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
+      <a href="/post/create" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
         <i class="bi bi-plus-square lg-me-2 fs-3"></i> <span> 게시판 개설하기 </span>
       </a>
       <a href="/favorites" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
