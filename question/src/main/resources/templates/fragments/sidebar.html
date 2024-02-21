@@ -1,0 +1,53 @@
+<!-- Path: question/src/main/resources/templates/fragments/sidebar.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko" th:fragment="sidebar">
+
+<body>
+  <div class="sidebar d-flex bg-light text-white flex-column fixed-top custom-mt border-top border-end border-2">
+    <div class="btn-group-vertical">
+      <a href="/member/signin" class="btn btn-light" th:if="${!#authorization.expression('isAuthenticated()')}">
+        <i class="bi bi-box-arrow-in-right lg-me-2 fs-3"></i> <span> 로그인 </span>
+      </a>
+      <a href="/member/signup" class="btn btn-light" th:if="${!#authorization.expression('isAuthenticated()')}">
+        <i class="bi bi-person-plus lg-lg-me-2 fs-3"></i> <span> 회원가입 </span>
+      </a>
+      <a href="/join-with-code" class="btn btn-light" th:if="${!#authorization.expression('isAuthenticated()')}">
+        <i class="bi bi-hash lg-me-2 fs-3"></i> <span> 코드로 참석하기 </span>
+      </a>
+      <!-- 로그인한 사용자를 위한 버튼들 -->
+      <a href="/member/myinfo" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
+        <i class="bi bi-person-circle lg-lg-me-2 fs-3"></i> <span> 내정보 </span>
+      </a>
+      <a href="/join-with-code" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
+        <i class="bi bi-hash lg-me-2 fs-3"></i> <span> 코드로 참석하기 </span>
+      </a>
+      <a href="/my-boards" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
+        <i class="bi bi-layout-text-sidebar-reverse lg-me-2 fs-3"></i> <span> 내가 만든 게시판 </span>
+      </a>
+      <a href="/my-questions" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
+        <i class="bi bi-question-circle lg-me-2 fs-3"></i> <span> 내가 남긴 질문 </span>
+      </a>
+      <a href="/post/create" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
+        <i class="bi bi-plus-square lg-me-2 fs-3"></i> <span> 게시판 개설하기 </span>
+      </a>
+      <a href="/favorites" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
+        <i class="bi bi-star lg-me-2 fs-3"></i> <span> 즐겨찾기 </span>
+      </a>
+    </div>
+
+    <div class="mt-auto custom-mb text-center border-top border-2  logoutbox">
+      <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+        <form action="/member/logout" method="post">
+          <div class="d-flex justify-content-center">
+            <input type="submit" value="로그아웃" class="btn btn-outline-primary btn-sm w-75 text-center" />
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          </div>
+        </form>
+      </li>
+    </div>
+  </div>
+
+
+</body>
+
+</html>
