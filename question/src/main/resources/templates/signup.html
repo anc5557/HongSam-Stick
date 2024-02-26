@@ -94,6 +94,7 @@
                 <input type="password" class="form-control" id="floatingPassword" placeholder=" " name="password"
                     required />
                 <label for="floatingPassword">비밀번호</label>
+                <p class="text-muted mt-1">비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자리여야 합니다.</p>
             </div>
             <input type="hidden" id="csrfToken" th:value="${_csrf.token}" />
             <input type="hidden" id="csrfHeader" th:value="${_csrf.headerName}" />
