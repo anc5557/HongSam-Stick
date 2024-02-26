@@ -47,7 +47,7 @@ public class MemberController {
         signupDto.getPassword(),
         signupDto.getName()
       );
-      return "redirect:/"; // 회원가입 성공 시 메인 페이지로 이동
+      return "redirect:/member/signin"; // 회원가입 성공 시 로그인 페이지로 이동
     } catch (RuntimeException e) {
       redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
       redirectAttributes.addFlashAttribute("signupDto", signupDto);
