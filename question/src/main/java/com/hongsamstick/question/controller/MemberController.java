@@ -2,8 +2,6 @@ package com.hongsamstick.question.controller;
 
 import com.hongsamstick.question.config.PrincipalDetails;
 import com.hongsamstick.question.domain.Member;
-import com.hongsamstick.question.dto.EmailDto;
-import com.hongsamstick.question.dto.NameDto;
 import com.hongsamstick.question.dto.SignUpDto;
 import com.hongsamstick.question.dto.UnregisterRequestDto;
 import com.hongsamstick.question.service.MemberService;
@@ -67,32 +65,6 @@ public class MemberController {
   @GetMapping("/signup")
   public String registerPage(@ModelAttribute("signupDto") SignUpDto signupDto) {
     return "signup";
-  }
-
-  /**
-   * 이메일이 존재하는지 확인합니다.
-   *  - POST /member/check-email
-   *
-   * @param emailDto emailDto 객체(email)
-   * @return 이메일이 존재하면 true, 그렇지 않으면 false를 반환합니다.
-   */
-  @PostMapping("/check-email")
-  @ResponseBody
-  public boolean checkEmail(@RequestBody EmailDto emailDto) {
-    return memberService.emailExists(emailDto.getEmail());
-  }
-
-  /**
-   * 주어진 이름이 시스템에 이미 존재하는지 확인합니다.
-   *  - POST /member/check-name
-   *
-   * @param nameDto NameDto 객체(name)
-   * @return 이름이 존재하면 true, 그렇지 않으면 false를 반환합니다.
-   */
-  @PostMapping("/check-name")
-  @ResponseBody
-  public boolean checkName(@RequestBody NameDto nameDto) {
-    return memberService.nameExists(nameDto.getName());
   }
 
   /**
