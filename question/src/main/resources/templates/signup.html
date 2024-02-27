@@ -19,11 +19,42 @@
                 /* 중앙 정렬 */
             }
         }
+
+        .loading-overlay {
+            position: fixed;
+            /* 화면에 고정 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            /* 전체 너비 */
+            height: 100%;
+            /* 전체 높이 */
+            background: rgba(0, 0, 0, 0.5);
+            /* 반투명 검은색 배경 */
+            display: flex;
+            justify-content: center;
+            /* 가로 중앙 정렬 */
+            align-items: center;
+            /* 세로 중앙 정렬 */
+            z-index: 9999;
+            /* 다른 요소 위에 표시 */
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            /* 스피너 크기 조정 */
+        }
     </style>
 
 </head>
 
 <body>
+    <div id="loading" class="loading-overlay" style="display: none;">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">인증 코드를 보내는 중입니다...</span>
+        </div>
+    </div>
     <div class="container text-center">
         <div class="logo mb-4">
             <!-- 로고 -->
@@ -44,14 +75,26 @@
                 <input type="email" class="form-control" id="email" placeholder=" " name="email" required
                     aria-describedby="button-addon2" th:field="*{email}" />
                 <label for="email">이메일</label>
-                <button class="btn btn-outline-secondary" id="button-addon2" type="button" onclick="checkEmail()">
-                    중복 확인 </button>
+                <button class="btn btn-outline-secondary btn-sm" id="button-addon2" type="button" onclick="sendEmail()">
+                    이메일 인증 </button>
+
+            </div>
+            <!-- 인증 코드 필드 -->
+            <div class="input-group form-floating mb-3" id="verificationCodeField" style="display: none;">
+                <input type="text" class="form-control" id="verificationCode" placeholder=" " name="verificationCode"
+                    required aria-describedby="button-addon3" th:field="*{verificationCode}" />
+                <label for="verificationCode">인증 코드</label>
+                <span class="input-group-text text-danger" id="timer">3:00</span>
+                <button class="btn btn-outline-secondary btn-lg" id="button-addon3" type="button"
+                    onclick="checkVerificationCode()">
+                    확인 </button>
             </div>
             <!-- 비밀번호 필드 -->
             <div class="form-floating mb-4">
                 <input type="password" class="form-control" id="floatingPassword" placeholder=" " name="password"
                     required />
                 <label for="floatingPassword">비밀번호</label>
+                <p class="text-muted mt-1">비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자리여야 합니다.</p>
             </div>
             <input type="hidden" id="csrfToken" th:value="${_csrf.token}" />
             <input type="hidden" id="csrfHeader" th:value="${_csrf.headerName}" />
@@ -63,58 +106,106 @@
         </form>
     </div>
 
-
     <script>
+        var intervalId;
+
         function getCsrfToken() {
             return {
                 token: document.getElementById('csrfToken').value,
                 header: document.getElementById('csrfHeader').value
             };
         }
+
         function validateEmail(email) {
             var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(String(email).toLowerCase());
         }
-        function checkEmail() {
-            var email = document.getElementById('email').value;
-            var csrf = getCsrfToken();
 
-            if (email === '') {
-                alert('이메일을 입력해주세요.');
-                return;
+        function handleResponse(response) {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Unknown error occurred');
+                });
             }
+            return response.json();
+        }
+
+        function getDefaultHeaders() {
+            var csrf = getCsrfToken();
+            return {
+                'Content-Type': 'application/json',
+                [csrf.header]: csrf.token
+            };
+        }
+
+        // 이메일 인증 코드 전송
+        function sendEmail() {
+            var email = document.getElementById('email').value;
             if (!validateEmail(email)) {
-                alert('올바른 이메일 형식을 입력해주세요.');
+                alert('이메일 형식이 올바르지 않습니다.');
                 return;
             }
-            fetch('/member/check-email', {
+
+            var csrf = getCsrfToken();
+            document.getElementById('loading').style.display = 'flex'; // 로딩 표시 시작
+            fetch('/signup/send-email-verification-code', {
+                method: 'POST',
+                headers: getDefaultHeaders(),
+                body: JSON.stringify({ email: email })
+            })
+                .then(handleResponse)
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById('verificationCodeField').style.display = 'flex';
+                    document.getElementById('button-addon2').innerHTML = '다시 보내기';
+                    if (intervalId) {
+                        clearInterval(intervalId); // 이전 타이머 중지
+                    }
+                    startTimer(180);
+                })
+                .catch(error => {
+                    alert(error.message);
+                })
+                .finally(() => {
+                    document.getElementById('loading').style.display = 'none'; // 로딩 표시 종료
+                });
+        }
+
+        // 인증 코드 확인
+        function checkVerificationCode() {
+            var email = document.getElementById('email').value;
+            var verificationCode = document.getElementById('verificationCode').value;
+
+            var csrf = getCsrfToken();
+            fetch('/signup/check-verification-code', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     [csrf.header]: csrf.token
                 },
-                body: JSON.stringify({ email: email })
+                body: JSON.stringify({ email: email, code: verificationCode })
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data) {
-                        alert('이미 사용 중인 이메일입니다.');
+                    if (data.verified) {
+                        alert(data.message);
+                        clearInterval(intervalId); // 타이머 중지
+                        document.getElementById('timer').textContent = "인증 완료"; // 타이머 텍스트 변경
+                        document.getElementById('timer').classList.remove('text-danger');
+                        document.getElementById('timer').classList.add('text-success');
                     } else {
-                        alert('사용 가능한 이메일입니다.');
+                        alert(data.message);
                     }
                 })
                 .catch(error => console.error('Error:', error));
         }
 
+        // 이름 중복 확인
         function checkName() {
             var name = document.getElementById('name').value;
-            var csrf = getCsrfToken();
 
-            if (name === '') {
-                alert('이름을 입력해주세요.');
-                return;
-            }
-            fetch('/member/check-name', {
+            var csrf = getCsrfToken();
+            fetch('/signup/check-name', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -124,13 +215,35 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data) {
-                        alert('이미 사용 중인 이름입니다.');
+                    if (data.exists) {
+                        alert(data.message);
                     } else {
-                        alert('사용 가능한 이름입니다.');
+                        alert(data.message);
                     }
                 })
                 .catch(error => console.error('Error:', error));
+        }
+
+        function startTimer(duration) {
+            var timer = duration, minutes, seconds;
+            var display = document.getElementById('timer'); // Get the timer element
+            display.textContent = "3:00"; // Initialize with 3:00
+
+            intervalId = setInterval(function () { // 타이머 ID 저장
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(intervalId);
+                    display.textContent = "시간 초과";
+                    alert('인증 코드 입력 시간이 만료되었습니다. 다시 시도해주세요.');
+                }
+            }, 1000);
         }
     </script>
 
