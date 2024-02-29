@@ -131,7 +131,7 @@ public class MemberController {
   /**
    * 비밀번호 변경
    * - POST /member/password
-   * - 비밀번호 변경 성공 시 홈페이지로 이동합니다. (로그아웃)
+   * - 비밀번호 변경 성공 시 로그인 페이지로 이동합니다. (로그아웃 상태)
    * - 비밀번호 변경 실패 시 비밀번호 변경 페이지로 이동합니다.
    * @param passwordUpdateDto     비밀번호 변경 DTO 객체
    * @param bindingResult         입력 유효성 검사를 위한 BindingResult 객체
@@ -159,7 +159,7 @@ public class MemberController {
         passwordUpdateDto.getNewPassword(),
         passwordUpdateDto.getNewPasswordConfirm()
       );
-      return "redirect:/"; // 비밀번호 변경 성공 시 홈페이지로 리다이렉트
+      return "redirect:/member/signin"; // 비밀번호 변경 성공 시 로그인 페이지로 리다이렉트
     } catch (RuntimeException e) {
       redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
       redirectAttributes.addFlashAttribute(
