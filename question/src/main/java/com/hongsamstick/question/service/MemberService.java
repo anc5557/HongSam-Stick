@@ -10,6 +10,7 @@ import java.util.Random;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,28 +101,6 @@ public class MemberService {
   // 이름 중복 확인
   public boolean nameExists(String name) {
     return memberRepository.existsByName(name);
-  }
-
-  // 회원 탈퇴
-  @Transactional
-  public boolean unregister(
-    @AuthenticationPrincipal PrincipalDetails principalDetails,
-    String inputPassword
-  ) {
-    String email = principalDetails.getUsername(); // 현재 인증된 사용자의 이메일
-
-    Member member = memberRepository.findByEmail(email).orElse(null); // 현재 인증된 사용자
-
-    // 현재 인증된 사용자가 없거나, 입력한 비밀번호가 일치하지 않으면 false 반환
-    if (
-      member == null ||
-      !passwordEncoder.matches(inputPassword, member.getPassword())
-    ) {
-      return false;
-    }
-
-    memberRepository.deleteByEmail(email);
-    return true;
   }
 
   // get 내 정보 페이지
@@ -226,5 +205,71 @@ public class MemberService {
     }
 
     return isVerified;
+  }
+
+  // 비밀번호 변경
+  @Transactional
+  public void changePassword(
+    Member member,
+    String oldPassword,
+    String newPassword,
+    String newPasswordConfirm
+  ) {
+    // 입력값이 null이면 예외 발생
+    if (
+      oldPassword == null || newPassword == null || newPasswordConfirm == null
+    ) {
+      throw new RuntimeException("입력되지 않은 값이 있습니다.");
+    }
+
+    // 기존 비밀번호가 일치하는지 확인
+    if (!passwordEncoder.matches(oldPassword, member.getPassword())) {
+      throw new RuntimeException("기존 비밀번호를 확인해주세요.");
+    }
+
+    // 새로운 비밀번호가 일치하는지 확인
+    if (!newPassword.equals(newPasswordConfirm)) {
+      throw new RuntimeException("새로운 비밀번호가 일치하지 않습니다.");
+    }
+
+    // 새로운 비밀번호 유효성 검사
+    if (!isValidPassword(newPassword)) {
+      throw new RuntimeException(
+        "비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자리여야 합니다."
+      );
+    }
+
+    // 새로운 비밀번호로 변경
+    member.setPassword(passwordEncoder.encode(newPassword));
+
+    // 변경된 회원 정보 저장
+    memberRepository.save(member);
+
+    // 세션 무효화
+    SecurityContextHolder.getContext().setAuthentication(null);
+  }
+
+  // 회원 탈퇴
+  @Transactional
+  public void unregister(Member member, String password) {
+    // 입력값이 null이면 예외 발생
+    if (password == null) {
+      throw new RuntimeException("입력되지 않은 값이 있습니다.");
+    }
+    // member가 null이면 예외 발생
+    if (member == null) {
+      throw new RuntimeException("회원 정보가 없습니다.");
+    }
+
+    // 비밀번호가 일치하는지 확인
+    if (!passwordEncoder.matches(password, member.getPassword())) {
+      throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+    }
+
+    // 회원 탈퇴
+    memberRepository.delete(member);
+
+    // 세션 무효화
+    SecurityContextHolder.getContext().setAuthentication(null);
   }
 }

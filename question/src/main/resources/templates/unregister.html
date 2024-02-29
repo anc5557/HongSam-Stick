@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout}" layout:fragment="content">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>회원 탈퇴</title>
+</head>
+
+<body>
+  <div class="unregister-container text-center mx-md-5 mx-sm-5">
+    <hr class="my-5" />
+    <h1>회원 탈퇴</h1>
+    <!-- 에러 메시지 표시 -->
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+      <p th:text="${errorMessage}"></p>
+    </div>
+    <form th:action="@{/member/unregister}" method="post" class="my-2" th:object="${unregisterRequestDto}">
+      <div class="password-box mb-3">
+        <label for="password" class="form-label h2">비밀번호 확인</label>
+        <input type="password" class="form-control" id="password" name="password" required th:field="*{password}">
+      </div>
+      <div class="alert alert-warning" role="alert">
+        회원 탈퇴 시 모든 정보가 삭제됩니다. 진짜 탈퇴하시겠습니까?
+      </div>
+      <button type="submit" class="btn btn-danger" onclick="return confirm('정말로 회원을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">회원
+        탈퇴</button>
+    </form>
+    <hr class="mt-5" />
+  </div>
+</body>
+
+
+</html>

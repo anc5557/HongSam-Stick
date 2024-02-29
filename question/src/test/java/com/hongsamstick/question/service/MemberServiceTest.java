@@ -1,5 +1,6 @@
 package com.hongsamstick.question.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,8 +13,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.hongsamstick.question.config.PrincipalDetails;
+import com.hongsamstick.question.domain.EmailVerification;
 import com.hongsamstick.question.domain.Member;
+import com.hongsamstick.question.repository.EmailVerificationRepository;
 import com.hongsamstick.question.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +36,9 @@ public class MemberServiceTest {
   private MemberRepository memberRepository;
 
   @Mock
+  private EmailVerificationRepository emailVerificationRepository;
+
+  @Mock
   private PasswordEncoder passwordEncoder;
 
   @InjectMocks
@@ -46,10 +51,14 @@ public class MemberServiceTest {
     String email = "test@example.com";
     String password = "Password123!";
     String name = "TestUser";
+    EmailVerification emailVerification = new EmailVerification();
+    emailVerification.setVerified(true);
 
     when(memberRepository.existsByEmail(anyString())).thenReturn(false); // 이메일 중복 검사
     when(memberRepository.existsByName(anyString())).thenReturn(false); // 이름 중복 검사
     when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword"); // 비밀번호 암호화
+    when(emailVerificationRepository.findById(anyString()))
+      .thenReturn(Optional.of(emailVerification)); // 이메일 인증 정보 조회
     when(memberRepository.save(any(Member.class))) // 회원 저장
       .thenAnswer(i -> i.getArgument(0)); // 저장된 회원 반환
 
@@ -133,13 +142,12 @@ public class MemberServiceTest {
     when(passwordEncoder.matches(correctPassword, "encodedPassword"))
       .thenReturn(true);
 
-    boolean result = memberService.unregister(
-      new PrincipalDetails(mockMember),
-      correctPassword
-    );
+    // 예외가 발생하지 않아야 함
+    assertDoesNotThrow(() -> {
+      memberService.unregister(mockMember, correctPassword);
+    });
 
-    assertTrue(result);
-    verify(memberRepository, times(1)).deleteByEmail(email);
+    verify(memberRepository, times(1)).delete(mockMember);
   }
 
   @Test
@@ -158,11 +166,14 @@ public class MemberServiceTest {
     when(passwordEncoder.matches(incorrectPassword, mockMember.getPassword()))
       .thenReturn(false);
 
-    boolean result = memberService.unregister(
-      new PrincipalDetails(mockMember),
-      incorrectPassword
+    // 비밀번호가 틀린 경우 예외가 발생해야 함
+    assertThrows(
+      RuntimeException.class,
+      () -> {
+        memberService.unregister(mockMember, incorrectPassword);
+      }
     );
-    assertFalse(result);
-    verify(memberRepository, never()).deleteByEmail(email);
+
+    verify(memberRepository, never()).delete(mockMember);
   }
 }

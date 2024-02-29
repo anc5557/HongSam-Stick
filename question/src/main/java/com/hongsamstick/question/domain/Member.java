@@ -1,6 +1,7 @@
 package com.hongsamstick.question.domain;
 
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +21,13 @@ public class Member {
   private String name; // 이름(중복 불가)
 
   private String picture;
+
+  @OneToMany(
+    mappedBy = "member",
+    cascade = CascadeType.ALL,
+    orphanRemoval = true
+  )
+  private List<Post> posts; // Member와 Post의 일대다 관계 설정
 
   @PrePersist
   public void prePersist() {
