@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout}" layout:fragment="content">
+
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>내가 개설한 질문 게시판</title>
+
+</head>
+
+<body>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center;">
+      <h2 class="ms-3">내가 개설한 질문 게시판</h2>
+      <div class="form-check form-switch ms-3">
+        <input class="form-check-input" type="checkbox" id="excludeEndedToggle" th:checked="${excludeEnded}">
+        <label class="form-check-label" for="excludeEndedToggle">
+          마감된 게시글 제외
+        </label>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button class="btn btn-primary btn-md dropdown-toggle me-3" type="button" id="sortMenuButton"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        <span th:switch="${sort}">
+          <span th:case="'latest'">최신순</span>
+          <span th:case="'oldest'">오래된순</span>
+          <span th:case="'views'">조회수순</span>
+        </span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="sortMenuButton">
+        <li><a class="dropdown-item" href="/post/my?sort=latest">최신순</a></li>
+        <li><a class="dropdown-item" href="/post/my?sort=oldest">오래된순</a></li>
+        <li><a class="dropdown-item" href="/post/my?sort=views">조회수순</a></li>
+      </ul>
+    </div>
+  </div>
+  <hr>
+  <!-- 게시글 목록이 있는 경우 -->
+  <div th:if="${not #lists.isEmpty(posts)}" class="container mt-4">
+    <div class="row">
+      <!-- 게시글 목록 반복 처리 -->
+      <div th:each="post : ${posts}" class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body d-flex flex-column">
+            <div class="row">
+              <!-- 제목, 내용, 조회수 -->
+              <div class="col-12">
+                <h5 class="card-title" th:text="${post.title}"></h5>
+                <p class="card-text" th:text="${post.content}"></p>
+                <p class="card-text"><small class="text-muted">조회수: <span th:text="${post.viewcount}"></span></small>
+                </p>
+                <!-- 마감 날짜 -->
+                <p class="card-text mt-3">
+                  <small class="text-muted">
+                    <span th:if="${post.endDate != null}"
+                      th:text="${#temporals.format(post.endDate, 'yyyy/MM/dd')}"></span>
+                    <span th:if="${post.endDate !=null}"
+                      th:text="${#temporals.format(post.endDate, 'HH:mm')}+'까지'"></span>
+
+                    <span th:if="${post.endDate == null}">마감 날짜 없음</span>
+                  </small>
+                </p>
+              </div>
+              <!-- 자세히 보기 링크 -->
+              <div class="row mt-auto">
+                <div class="col-12 text-end">
+                  <a th:href="@{/post/{code}(code=${post.code})}" class="card-link">게시판 보기</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 게시글 목록이 비어 있는 경우 -->
+    <div th:if="${#lists.isEmpty(posts)}" class="text-center mt-4">
+      <p>현재 진행중인 질문 게시판이 없습니다.</p>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div th:if="${not #lists.isEmpty(posts)}" class="mt-4">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" th:classappend="${posts.isFirst() ? 'disabled' : ''}">
+            <a class="page-link" th:href="@{/post/my(page=${posts.number - 1}, sort=${sort})}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li th:each="pageNum : ${#numbers.sequence(0, posts.totalPages - 1)}" class="page-item"
+            th:classappend="${pageNum == posts.number ? 'active' : ''}">
+            <a class="page-link" th:text="${pageNum + 1}" th:href="@{/post/my(page=${pageNum}, sort=${sort})}"></a>
+          </li>
+          <li class="page-item" th:classappend="${posts.isLast() ? 'disabled' : ''}">
+            <a class="page-link" th:href="@{/post/my(page=${posts.number + 1}, sort=${sort})}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  </div>
+</body>
+
+<script>
+  document.getElementById('excludeEndedToggle').addEventListener('change', function () {
+    var url = new URL(window.location.href);
+    url.searchParams.set('excludeEnded', this.checked);
+    window.location.href = url.toString();
+  });
+</script>
+
+</html>
