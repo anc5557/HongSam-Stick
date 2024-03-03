@@ -2,18 +2,16 @@ package com.hongsamstick.question.controller;
 
 import com.hongsamstick.question.config.PrincipalDetails;
 import com.hongsamstick.question.domain.Member;
-import com.hongsamstick.question.dto.EmailDto;
-import com.hongsamstick.question.dto.NameDto;
+import com.hongsamstick.question.dto.PasswordUpdateDto;
 import com.hongsamstick.question.dto.SignUpDto;
 import com.hongsamstick.question.dto.UnregisterRequestDto;
 import com.hongsamstick.question.service.MemberService;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -49,7 +47,7 @@ public class MemberController {
         signupDto.getPassword(),
         signupDto.getName()
       );
-      return "redirect:/"; // 회원가입 성공 시 메인 페이지로 이동
+      return "redirect:/member/signin"; // 회원가입 성공 시 로그인 페이지로 이동
     } catch (RuntimeException e) {
       redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
       redirectAttributes.addFlashAttribute("signupDto", signupDto);
@@ -67,32 +65,6 @@ public class MemberController {
   @GetMapping("/signup")
   public String registerPage(@ModelAttribute("signupDto") SignUpDto signupDto) {
     return "signup";
-  }
-
-  /**
-   * 이메일이 존재하는지 확인합니다.
-   *  - POST /member/check-email
-   *
-   * @param emailDto emailDto 객체(email)
-   * @return 이메일이 존재하면 true, 그렇지 않으면 false를 반환합니다.
-   */
-  @PostMapping("/check-email")
-  @ResponseBody
-  public boolean checkEmail(@RequestBody EmailDto emailDto) {
-    return memberService.emailExists(emailDto.getEmail());
-  }
-
-  /**
-   * 주어진 이름이 시스템에 이미 존재하는지 확인합니다.
-   *  - POST /member/check-name
-   *
-   * @param nameDto NameDto 객체(name)
-   * @return 이름이 존재하면 true, 그렇지 않으면 false를 반환합니다.
-   */
-  @PostMapping("/check-name")
-  @ResponseBody
-  public boolean checkName(@RequestBody NameDto nameDto) {
-    return memberService.nameExists(nameDto.getName());
   }
 
   /**
@@ -116,39 +88,6 @@ public class MemberController {
   }
 
   /**
-   * 회원 탈퇴
-   *  - DELETE /member/unregister
-   *  - 회원 탈퇴 성공 시 로그인 페이지로 이동합니다.
-   *  - 회원 탈퇴 실패 시 메인 페이지로 이동합니다.
-   */
-  // 회원 탈퇴 처리
-  @DeleteMapping("/unregister")
-  public ModelAndView unregister(
-    @AuthenticationPrincipal PrincipalDetails principalDetails,
-    @RequestBody UnregisterRequestDto requestDto
-  ) {
-    boolean isUnregistered = memberService.unregister(
-      principalDetails,
-      requestDto.getPassword()
-    );
-
-    ModelAndView modelAndView = new ModelAndView();
-
-    if (!isUnregistered) {
-      modelAndView.addObject("message", "비밀번호가 일치하지 않습니다.");
-      modelAndView.setViewName("redirect:/");
-      return modelAndView;
-    }
-
-    // 사용자가 성공적으로 탈퇴 처리되면 세션을 무효화
-    SecurityContextHolder.clearContext();
-
-    modelAndView.addObject("message", "회원 탈퇴가 성공적으로 처리되었습니다.");
-    modelAndView.setViewName("redirect:/member/signin");
-    return modelAndView;
-  }
-
-  /**
    * 내 정보 페이지 렌더링
    * - GET /member/myinfo
    * - 내 정보 페이지로 이동합니다.
@@ -163,5 +102,108 @@ public class MemberController {
     model.addAttribute("name", member.getName());
     model.addAttribute("picture", member.getPicture());
     return "myinfo";
+  }
+
+  /**
+   * 비밀번호 변경 페이지 렌더링
+   * - GET /member/password
+   * - 비밀번호 변경 페이지로 이동합니다.
+   * @return 비밀번호 변경 페이지의 이름
+   */
+  @GetMapping("/password")
+  public String password(Model model) {
+    model.addAttribute("passwordUpdateDto", new PasswordUpdateDto());
+    return "passwordUpdate";
+  }
+
+  /**
+   * 회원 탈퇴 페이지 렌더링
+   * - GET /member/unregister
+   * - 회원 탈퇴 페이지로 이동합니다.
+   * @return 회원 탈퇴 페이지의 이름
+   */
+  @GetMapping("/unregister")
+  public String unregister(Model model) {
+    model.addAttribute("unregisterRequestDto", new UnregisterRequestDto());
+    return "unregister";
+  }
+
+  /**
+   * 비밀번호 변경
+   * - POST /member/password
+   * - 비밀번호 변경 성공 시 로그인 페이지로 이동합니다. (로그아웃 상태)
+   * - 비밀번호 변경 실패 시 비밀번호 변경 페이지로 이동합니다.
+   * @param passwordUpdateDto     비밀번호 변경 DTO 객체
+   * @param bindingResult         입력 유효성 검사를 위한 BindingResult 객체
+   * @param redirectAttributes    리다이렉션 중 값을 전달하기 위한 RedirectAttributes 객체
+   * @return                      리다이렉션 URL을 나타내는 문자열
+   */
+  @PostMapping("/password")
+  public String passwordUpdate(
+    @Valid @ModelAttribute(
+      "passwordUpdateDto"
+    ) PasswordUpdateDto passwordUpdateDto,
+    BindingResult bindingResult,
+    RedirectAttributes redirectAttributes,
+    @AuthenticationPrincipal PrincipalDetails principalDetails
+  ) {
+    if (bindingResult.hasErrors()) {
+      return "passwordUpdate"; // 유효성 검증 오류가 있는 경우, 다시 비밀번호 변경 페이지로
+    }
+
+    try {
+      Member member = principalDetails.getMember();
+      memberService.changePassword(
+        member,
+        passwordUpdateDto.getCurrentPassword(),
+        passwordUpdateDto.getNewPassword(),
+        passwordUpdateDto.getNewPasswordConfirm()
+      );
+      return "redirect:/member/signin"; // 비밀번호 변경 성공 시 로그인 페이지로 리다이렉트
+    } catch (RuntimeException e) {
+      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+      redirectAttributes.addFlashAttribute(
+        "passwordUpdateDto",
+        passwordUpdateDto
+      );
+      return "redirect:/member/password"; // 비밀번호 변경 실패 시, 에러 메시지와 함께 리다이렉트
+    }
+  }
+
+  /**
+   * 회원 탈퇴
+   * - POST /member/unregister
+   * - 회원 탈퇴 성공 시 로그아웃 후 메인 페이지로 이동합니다.
+   * - 회원 탈퇴 실패 시 회원 탈퇴 페이지로 이동합니다.
+   * @param UnregisterRequestDto 회원 탈퇴 DTO 객체
+   * @param bindingResult         입력 유효성 검사를 위한 BindingResult 객체
+   * @param redirectAttributes    리다이렉션 중 값을 전달하기 위한 RedirectAttributes 객체
+   * @return                      리다이렉션 URL을 나타내는 문자열
+   */
+  @PostMapping("/unregister")
+  public String unregister(
+    @ModelAttribute(
+      "unregisterRequestDto"
+    ) UnregisterRequestDto unregisterRequestDto,
+    BindingResult bindingResult,
+    RedirectAttributes redirectAttributes,
+    @AuthenticationPrincipal PrincipalDetails principalDetails
+  ) {
+    if (bindingResult.hasErrors()) {
+      return "unregister"; // 유효성 검증 오류가 있는 경우, 다시 회원 탈퇴 페이지로
+    }
+
+    try {
+      Member member = principalDetails.getMember();
+      memberService.unregister(member, unregisterRequestDto.getPassword());
+      return "redirect:/"; // 회원 탈퇴 성공 시 홈페이지로 리다이렉트
+    } catch (RuntimeException e) {
+      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+      redirectAttributes.addFlashAttribute(
+        "unregisterRequestDto",
+        unregisterRequestDto
+      );
+      return "redirect:/member/unregister"; // 회원 탈퇴 실패 시, 에러 메시지와 함께 리다이렉트
+    }
   }
 }

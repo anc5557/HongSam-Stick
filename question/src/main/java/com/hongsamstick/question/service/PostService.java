@@ -136,4 +136,26 @@ public class PostService {
       pageable
     );
   }
+
+  // 내가 개설한 게시판 목록 보여주기
+  public Page<Post> getMyPosts(
+    String email,
+    Boolean excludeEnded,
+    Pageable pageable
+  ) {
+    return postRepository.findByMemberEmailAndExcludeEnded(
+      email,
+      excludeEnded,
+      pageable
+    );
+  }
+
+  // code로 게시글 찾기
+  public Post getPostJoinWithCode(UUID code) {
+    return postRepository
+      .findByCodeAndEndDateAfter(code, LocalDateTime.now())
+      .orElseThrow(() ->
+        new EntityNotFoundException("게시판을 찾을 수 없습니다." + code)
+      );
+  }
 }
