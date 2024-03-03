@@ -11,17 +11,17 @@
       <a href="/member/signup" class="btn btn-light" th:if="${!#authorization.expression('isAuthenticated()')}">
         <i class="bi bi-person-plus lg-lg-me-2 fs-3"></i> <span> 회원가입 </span>
       </a>
-      <a href="/join-with-code" class="btn btn-light" th:if="${!#authorization.expression('isAuthenticated()')}">
+      <a href="/post/join-with-code" class="btn btn-light" th:if="${!#authorization.expression('isAuthenticated()')}">
         <i class="bi bi-hash lg-me-2 fs-3"></i> <span> 코드로 참석하기 </span>
       </a>
       <!-- 로그인한 사용자를 위한 버튼들 -->
       <a href="/member/myinfo" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
         <i class="bi bi-person-circle lg-lg-me-2 fs-3"></i> <span> 내정보 </span>
       </a>
-      <a href="/join-with-code" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
+      <a href="/post/join-with-code" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
         <i class="bi bi-hash lg-me-2 fs-3"></i> <span> 코드로 참석하기 </span>
       </a>
-      <a href="/my-boards" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
+      <a href="/post/my" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">
         <i class="bi bi-layout-text-sidebar-reverse lg-me-2 fs-3"></i> <span> 내가 만든 게시판 </span>
       </a>
       <a href="/my-questions" class="btn btn-light" th:if="${#authorization.expression('isAuthenticated()')}">

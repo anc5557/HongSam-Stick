@@ -6,6 +6,11 @@ import com.hongsamstick.question.dto.PostDto;
 import com.hongsamstick.question.service.PostService;
 import jakarta.validation.Valid;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -137,5 +142,64 @@ public class PostController {
     model.addAttribute("postDto", postDto);
     model.addAttribute("code", code);
     return "edit-post";
+  }
+
+  /**
+   * 내가 쓴 게시글 페이지
+   * GET /post/my
+   *
+   * @param model
+   * @param principalDetails
+   * @return  my-post.html
+   */
+  @GetMapping("/my")
+  public String myPostPage(
+    Model model,
+    @AuthenticationPrincipal PrincipalDetails principalDetails,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "false") boolean excludeEnded,
+    @RequestParam(defaultValue = "latest") String sort
+  ) {
+    Sort sortSpecification;
+    switch (sort) {
+      case "oldest":
+        sortSpecification = Sort.by("startDate");
+        break;
+      case "views":
+        sortSpecification = Sort.by("viewcount").descending();
+        break;
+      case "latest":
+      default:
+        sortSpecification = Sort.by("startDate").descending();
+        break;
+    }
+
+    Pageable pageable = PageRequest.of(page, size, sortSpecification);
+    model.addAttribute(
+      "posts",
+      postService.getMyPosts(
+        principalDetails.getMember().getEmail(),
+        excludeEnded,
+        pageable
+      )
+    );
+    model.addAttribute("sort", sort);
+    model.addAttribute("excludeEnded", excludeEnded);
+    return "my-post";
+  }
+
+  // 코드로 게시글 찾기 페이지
+  // GET /post/join-with-code
+  @GetMapping("/join-with-code")
+  public String joinWithCodePage() {
+    return "join-with-code";
+  }
+
+  // 코드로 게시글 찾기
+  // POST /post/join-with-code
+  @PostMapping("/join-with-code")
+  public String joinWithCode(@RequestParam UUID code) {
+    return "redirect:/post/" + code.toString();
   }
 }

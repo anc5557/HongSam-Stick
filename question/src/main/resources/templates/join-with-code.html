@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout}" layout:fragment="content">
+
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title> 코드로 게시물 찾기 </title>
+
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-lg-6 mx-auto">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="text-center"> 코드로 참석하기 </h3>
+          </div>
+          <div class="card-body">
+            <form action="/post/join-with-code" method="post">
+              <div class="mb-3">
+                <label for="code" class="form-label"> 코드 </label>
+                <p class="text-muted">UUID 형식을 따르는 코드를 입력해주세요. <a
+                    href="https://ko.wikipedia.org/wiki/%EB%B2%94%EC%9A%A9_%EA%B3%A0%EC%9C%A0_%EC%8B%9D%EB%B3%84%EC%9E%90"
+                    target="_blank">더 알아보기</a></p>
+                <input type="text" class="form-control" id="code" name="code" required>
+              </div>
+              <div class="d-grid gap-2">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-primary"> 참석하기 </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
