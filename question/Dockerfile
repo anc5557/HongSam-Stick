@@ -5,7 +5,7 @@ FROM openjdk:17-slim
 WORKDIR /app
 
 # JAR 파일 복사
-COPY ./question/build/libs/question-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY ./build/libs/question-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # 8080 포트 오픈
 EXPOSE 8080
