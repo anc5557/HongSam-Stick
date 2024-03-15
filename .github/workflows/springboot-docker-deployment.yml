@@ -52,28 +52,13 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
-
-  # ec2 서버에 접속
-
-  ec2:
-    needs: build_and_push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
         with:
-          ssh-private-key: ${{ secrets.EC2_KEY }}
-    
-  # 도커 허브에서 이미지 pull
-  docker:
-    needs: ec2
-    runs-on: ubuntu-latest
-    steps:
-      - name: Pull Docker image
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
-      - name: Stop existing container
-        run: docker stop myapp || true
-      - name: Run Docker container
-        run: docker run -d --rm --name myapp -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
+          host: ${{ secrets.HONGSAMSTICK_EC2_HOST }}
+          username: ${{ secrets.HONGSAMSTICK_EC2_USERNAME }}
+          key: ${{ secrets.HONGSAMSTICK_EC2_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
+            docker stop myapp || true
+            docker run -d --rm --name myapp -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
