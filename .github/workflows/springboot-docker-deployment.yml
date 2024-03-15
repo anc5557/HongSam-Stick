@@ -36,7 +36,7 @@ jobs:
           echo "spring.mail.properties.mail.smtp.ssl.enable=true" >> question/src/main/resources/application.properties
           echo "spring.mail.default-encoding=UTF-8" >> question/src/main/resources/application.properties
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./question/gradlew build
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -74,7 +74,7 @@ jobs:
 
   # ec2 서버에 접속
 
-  deploy:
+  ec2:
     needs: push
     runs-on: ubuntu-latest
     steps:
@@ -86,8 +86,8 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     
   # 도커 허브에서 이미지 pull
-  pull:
-    needs: push
+  docker:
+    needs: ec2
     runs-on: ubuntu-latest
     steps:
       - name: Pull Docker image
