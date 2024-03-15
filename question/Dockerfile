@@ -1,20 +1,11 @@
 # Java 17 버전을 사용하는 OpenJDK 베이스 이미지
-FROM openjdk:17 AS builder
-
-# 작업 디렉토리 설정
-WORKDIR /app
-
-# 빌드된 JAR 파일 복사
-COPY ./build/libs/*.jar /app/app.jar
-
-# Java 17 버전을 사용하는 OpenJDK 베이스 이미지
 FROM openjdk:17-slim
 
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 빌드된 JAR 파일 복사
-COPY --from=builder /app/app.jar /app/app.jar
+# JAR 파일 복사 (GitHub Actions 워크플로우에서 올바른 경로를 지정해야 함)
+COPY question/build/libs/*.jar /app/app.jar
 
 # 8080 포트 오픈
 EXPOSE 8080
