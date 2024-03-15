@@ -39,11 +39,11 @@ jobs:
         run: |
           cd question
           ./gradlew build
-      - name: Upload build artifacts
+      - name: Upload build artifacts 
         uses: actions/upload-artifact@v2
         with:
           name: question
-          path: question/build/libs/question-0.0.1-SNAPSHOT.jar
+          path: question/build/libs/question-0.0.1-SNAPSHOT.jar 
     
   # 도커 허브에 이미지를 푸시하는 작업
 

@@ -4,8 +4,8 @@ FROM openjdk:17-slim
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# JAR 파일 복사 (GitHub Actions 워크플로우에서 올바른 경로를 지정해야 함)
-COPY question/build/libs/*.jar /app/app.jar
+# JAR 파일 복사
+COPY ./question/build/libs/question-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # 8080 포트 오픈
 EXPOSE 8080
