@@ -36,7 +36,9 @@ jobs:
           echo "spring.mail.properties.mail.smtp.ssl.enable=true" >> question/src/main/resources/application.properties
           echo "spring.mail.default-encoding=UTF-8" >> question/src/main/resources/application.properties
       - name: Build with Gradle
-        run: ./question/gradlew build
+        run: |
+          cd question
+          ./gradlew build
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
