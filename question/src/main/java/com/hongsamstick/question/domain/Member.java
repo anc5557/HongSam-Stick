@@ -1,6 +1,7 @@
 package com.hongsamstick.question.domain;
 
 import jakarta.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,9 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Member {
+public class Member implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   @Id
   @Column(unique = true, nullable = false)
@@ -27,12 +30,12 @@ public class Member {
     cascade = CascadeType.ALL,
     orphanRemoval = true
   )
-  private List<Post> posts; // Member와 Post의 일대다 관계 설정
+  private List<Post> posts;
 
   @PrePersist
   public void prePersist() {
     if (picture == null) {
-      picture = "/profile_image.png"; // 기본 프로필 사진 URL
+      picture = "/profile_image.png";
     }
   }
 }
