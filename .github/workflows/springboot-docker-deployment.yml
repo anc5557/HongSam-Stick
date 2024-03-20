@@ -64,7 +64,7 @@ jobs:
             docker stop myapp-8081 || true
             docker pull ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
             docker run -d --rm --name myapp-8081 --network hs-network -p 8081:8080 ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot  
-            sleep 30
+            sleep 90
             docker stop myapp-8082 || true
             docker pull ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
             docker run -d --rm --name myapp-8082 --network hs-network -p 8082:8080 ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
