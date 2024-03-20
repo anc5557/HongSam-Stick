@@ -35,7 +35,7 @@ jobs:
           echo "spring.mail.properties.mail.smtp.ssl.trust=${{ secrets.HONGSAMSTICK_MAIL_HOST }}" >> question/src/main/resources/application.properties
           echo "spring.mail.properties.mail.smtp.ssl.enable=true" >> question/src/main/resources/application.properties
           echo "spring.mail.default-encoding=UTF-8" >> question/src/main/resources/application.properties
-          echo "spring.data.redis.host=localhost" >> question/src/main/resources/application.properties
+          echo "spring.data.redis.host=my-redis" >> question/src/main/resources/application.properties
           echo "spring.data.redis.port=6379" >> question/src/main/resources/application.properties
 
       - name: Build with Gradle
