@@ -35,6 +35,9 @@ jobs:
           echo "spring.mail.properties.mail.smtp.ssl.trust=${{ secrets.HONGSAMSTICK_MAIL_HOST }}" >> question/src/main/resources/application.properties
           echo "spring.mail.properties.mail.smtp.ssl.enable=true" >> question/src/main/resources/application.properties
           echo "spring.mail.default-encoding=UTF-8" >> question/src/main/resources/application.properties
+          echo "spring.data.redis.host=${{ secrets.HONGSAMSTICK_REDIS_HOST }}" >> question/src/main/resources/application.properties
+          echo "spring.data.redis.port=${{ secrets.HONGSAMSTICK_REDIS_PORT }}" >> question/src/main/resources/application.properties
+
       - name: Build with Gradle
         run: |
           cd question
@@ -52,13 +55,33 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
-      - name: Deploy to EC2
+      - name: Deploy to EC2 on 8081 port
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HONGSAMSTICK_EC2_HOST }}
           username: ${{ secrets.HONGSAMSTICK_EC2_USERNAME }}
           key: ${{ secrets.HONGSAMSTICK_EC2_KEY }}
           script: |
-            docker stop myapp || true
+            docker stop myapp-8081 || true
             docker pull ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
-            docker run -d --rm --name myapp -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
+            docker run -d --rm --name myapp-8081 -p 8081:8080 ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
+            sleep 30
+            if ! curl -s http://localhost:8081/actuator/health | grep UP; then
+              echo "Health check failed on port 8081"
+              exit 1
+            fi
+      - name: Deploy to EC2 on 8082 port
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HONGSAMSTICK_EC2_HOST }}
+          username: ${{ secrets.HONGSAMSTICK_EC2_USERNAME }}
+          key: ${{ secrets.HONGSAMSTICK_EC2_KEY }}
+          script: |
+            docker stop myapp-8082 || true
+            docker run -d --rm --name myapp-8082 -p 8082:8080 ${{ secrets.DOCKER_USERNAME }}/hongsamstick:springboot
+            sleep 30
+            if ! curl -s http://localhost:8082/actuator/health | grep UP; then
+              echo "Health check failed on port 8082"
+              exit 1
+            fi
+
